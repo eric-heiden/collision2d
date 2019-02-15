@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 2.8.11)
+project(collision2d)
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+add_executable(collision2d_demo sat.hpp demo.cpp)
+target_link_libraries(collision2d_demo Eigen3::Eigen)
