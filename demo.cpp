@@ -11,10 +11,17 @@ int main(int argc, char **argv) {
 
   std::cout << "intersect(a, b) ? " << std::boolalpha << intersect(a, b)
             << std::endl;
-    std::cout << "intersect(b, c) ? " << std::boolalpha << intersect(b, c)
-              << std::endl;
-    std::cout << "intersect(a, c) ? " << std::boolalpha << intersect(a, c)
-              << std::endl;
+  std::cout << "intersect(b, c) ? " << std::boolalpha << intersect(b, c)
+            << std::endl;
+  std::cout << "intersect(a, c) ? " << std::boolalpha << intersect(a, c)
+            << std::endl;
+
+  const std::vector<Point<double>> points{
+      {0, 0}, {0.5, 0.5}, {5, 2}, {-1, 0}, {1, 5}};
+  for (const auto &point : points) {
+    std::cout << "intersect([" << point(0) << ' ' << point(1) << "], a) ? "
+              << std::boolalpha << intersect(point, a) << std::endl;
+  }
 
   return EXIT_SUCCESS;
 }

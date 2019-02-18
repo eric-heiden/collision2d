@@ -61,4 +61,26 @@ template <typename N> bool intersect(const Polygon<N> &a, const Polygon<N> &b) {
 
   return true;
 }
+
+/**
+ * Efficient test for a point to be in a convex polygon.
+ *
+ * Robert Nowak "An Efficient Test for a Point to Be in a Convex Polygon"
+ * http://demonstrations.wolfram.com/AnEfficientTestForAPointToBeInAConvexPolygon/
+ * Wolfram Demonstrations Project
+ * Published: March 7 2011
+ */
+template <typename N>
+bool intersect(const Point<N> &point, const Polygon<N> &polygon) {
+  bool angle{}; // stores the sign of the last angle
+  for (auto i = 0u; i < polygon.size(); ++i) {
+    const auto &a = polygon[i] - point;
+    const auto &b = polygon[(i + 1) % polygon.size()] - point;
+    const bool newAngle = b(0) * a(1) - a(0) * b(1) > 0;
+    if (i > 0 && angle != newAngle)
+      return false;
+    angle = newAngle;
+  }
+  return true;
+}
 } // namespace collision2d
