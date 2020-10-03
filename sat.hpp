@@ -61,25 +61,45 @@ bool intersect(const Polygon<N> &a, const Polygon<N> &b) {
   return true;
 }
 
+// /**
+//  * Efficient test for a point to be in a convex polygon.
+//  *
+//  * Robert Nowak "An Efficient Test for a Point to Be in a Convex Polygon"
+//  * http://demonstrations.wolfram.com/AnEfficientTestForAPointToBeInAConvexPolygon/
+//  * Wolfram Demonstrations Project
+//  * Published: March 7 2011
+//  */
+// template <typename N>
+// bool intersect2(const Point<N> &point, const Polygon<N> &polygon,
+//                 const N &epsilon = 1e-4) {
+//   bool angle = false;  // stores the sign of the last angle
+//   for (auto i = 0u; i < polygon.size(); ++i) {
+//     const auto &a = polygon[i] - point;
+//     const auto &b = polygon[(i + 1) % polygon.size()] - point;
+//     const bool newAngle = b(0) * a(1) - a(0) * b(1) > -epsilon;
+//     if (i > 0 && angle != newAngle) return false;
+//     angle = newAngle;
+//   }
+//   return true;
+// }
+
 /**
- * Efficient test for a point to be in a convex polygon.
- *
- * Robert Nowak "An Efficient Test for a Point to Be in a Convex Polygon"
- * http://demonstrations.wolfram.com/AnEfficientTestForAPointToBeInAConvexPolygon/
- * Wolfram Demonstrations Project
- * Published: March 7 2011
+ * Tests whether point intersects with convex polygon.
+ * Source: https://stackoverflow.com/a/8721483
  */
 template <typename N>
 bool intersect(const Point<N> &point, const Polygon<N> &polygon,
                const N &epsilon = 1e-4) {
-  bool angle{};  // stores the sign of the last angle
-  for (auto i = 0u; i < polygon.size(); ++i) {
-    const auto &a = polygon[i] - point;
-    const auto &b = polygon[(i + 1) % polygon.size()] - point;
-    const bool newAngle = b(0) * a(1) - a(0) * b(1) > -epsilon;
-    if (i > 0 && angle != newAngle) return false;
-    angle = newAngle;
+  bool result = false;
+  std::size_t i, j;
+  for (i = 0, j = polygon.size() - 1; i < polygon.size(); j = i++) {
+    if ((polygon[i].y() > point.y()) != (polygon[j].y() > point.y()) &&
+        (point.x() < (polygon[j].x() - polygon[i].x()) * (point.y() - polygon[i].y()) /
+                          (polygon[j].y() - polygon[i].y() + epsilon) +
+                      polygon[i].x())) {
+      result = !result;
+    }
   }
-  return true;
+  return result;
 }
 }  // namespace collision2d
