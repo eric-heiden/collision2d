@@ -1,14 +1,15 @@
 #pragma once
 
 #include <Eigen/Core>
-
 #include <limits>
 #include <vector>
 
 namespace collision2d {
-template <typename N> using Point = Eigen::Matrix<N, 2, 1>;
+template <typename N>
+using Point = Eigen::Matrix<N, 2, 1>;
 
-template <typename N> using Polygon = std::vector<Point<N>>;
+template <typename N>
+using Polygon = std::vector<Point<N>>;
 
 /**
  * Computes potential separating axes for a convex polygon.
@@ -35,17 +36,16 @@ void project(const Polygon<N> &a, const Point<N> &axis, N &minProj,
   minProj = std::numeric_limits<N>::infinity();
   for (const Point<N> &v : a) {
     const N proj = axis.dot(v);
-    if (proj < minProj)
-      minProj = proj;
-    if (proj > maxProj)
-      maxProj = proj;
+    if (proj < minProj) minProj = proj;
+    if (proj > maxProj) maxProj = proj;
   }
 }
 
 /**
  * Check for collision between polygons a and b via the Separating Axis Theorem.
  */
-template <typename N> bool intersect(const Polygon<N> &a, const Polygon<N> &b) {
+template <typename N>
+bool intersect(const Polygon<N> &a, const Polygon<N> &b) {
   // compute separating axes
   std::vector<Point<N>> axes;
   separatingAxes(a, axes);
@@ -55,8 +55,7 @@ template <typename N> bool intersect(const Polygon<N> &a, const Polygon<N> &b) {
     project(a, axis, aMinProj, aMaxProj);
     project(b, axis, bMinProj, bMaxProj);
     // check if projections overlap
-    if (aMinProj > bMaxProj || bMinProj > aMaxProj)
-      return false;
+    if (aMinProj > bMaxProj || bMinProj > aMaxProj) return false;
   }
 
   return true;
@@ -71,16 +70,16 @@ template <typename N> bool intersect(const Polygon<N> &a, const Polygon<N> &b) {
  * Published: March 7 2011
  */
 template <typename N>
-bool intersect(const Point<N> &point, const Polygon<N> &polygon) {
-  bool angle{}; // stores the sign of the last angle
+bool intersect(const Point<N> &point, const Polygon<N> &polygon,
+               const N &epsilon = 1e-4) {
+  bool angle{};  // stores the sign of the last angle
   for (auto i = 0u; i < polygon.size(); ++i) {
     const auto &a = polygon[i] - point;
     const auto &b = polygon[(i + 1) % polygon.size()] - point;
-    const bool newAngle = b(0) * a(1) - a(0) * b(1) > 0;
-    if (i > 0 && angle != newAngle)
-      return false;
+    const bool newAngle = b(0) * a(1) - a(0) * b(1) > -epsilon;
+    if (i > 0 && angle != newAngle) return false;
     angle = newAngle;
   }
   return true;
 }
-} // namespace collision2d
+}  // namespace collision2d
